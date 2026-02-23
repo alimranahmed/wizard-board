@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('member_team', function (Blueprint $table) {
+        Schema::create('game_member', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('game_id')->constrained('games', 'id')->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained('members', 'id')->cascadeOnDelete();
+            $table->integer('order')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('member_team');
+        Schema::dropIfExists('game_member');
     }
 };

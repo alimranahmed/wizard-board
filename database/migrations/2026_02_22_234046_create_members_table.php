@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('members', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique()->nullable();
-            $table->foreignId('game_id')
-                ->constrained('games', 'id')
+
+            $table->foreignId('added_by')->nullable()
+                ->constrained('users', 'id')
                 ->cascadeOnDelete();
-            $table->unique(['game_id', 'name']);
+
+            $table->string('email')->unique()->nullable();
             $table->timestamps();
         });
     }

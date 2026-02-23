@@ -14,6 +14,16 @@ return new class extends Migration
         Schema::create('games', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('status')->nullable();
+            $table->string('slug')->unique();
+            $table->string('password', 1024)->nullable();
+
+            $table->foreignId('manager_id')
+                ->constrained('users', 'id')
+                ->cascadeOnDelete();
+
+            $table->dateTime('started_at')->nullable();
+            $table->dateTime('finished_at')->nullable();
             $table->timestamps();
         });
     }

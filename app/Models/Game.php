@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Game extends Model
 {
@@ -13,8 +13,8 @@ class Game extends Model
 
     protected $guarded = ['id'];
 
-    public function members(): HasMany
+    public function members(): BelongsToMany
     {
-        return $this->hasMany(Member::class);
+        return $this->belongsToMany(Member::class, 'game_member');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\GameStatus;
 use App\Models\Game;
 use App\Models\Member;
 use Illuminate\Support\Collection;
@@ -11,6 +12,8 @@ new class extends Component
 
     public array $members = [];
 
+    public array $game = [];
+
     public function mount(): void
     {
         $this->games = $this->getGames();
@@ -18,7 +21,7 @@ new class extends Component
 
     public array $rules = [
         'members' => 'array|min:2|max:10',
-        'members.*' => 'required|string|min:3|max:255',
+        'members.*' => 'required|string|min:3|max:50',
     ];
 
     public function saveMembers(array $members): void
@@ -27,16 +30,30 @@ new class extends Component
 
         $this->validate();
 
-        $totalGame = Game::query()->whereToday('created_at')->count();
+        $totalGame = Game::query()
+            ->whereToday('created_at')
+            ->where('user_id', auth()->id())
+            ->count();
 
         $game = Game::query()
             ->create([
-                'name' => today()->format('jS M Y').'(Game '.($totalGame + 1).')']
-            );
+                'manager_id' => auth()->id(),
+                'password' => Hash::make(Arr::get($this->game, 'password', 'secret')),
+                'name' => $name = today()->format('jS M Y').'(Game '.($totalGame + 1).')',
+                'slug' => Arr::get($this->game, 'slug') ?: Str::slug($name),
+                'status' => GameStatus::Progress,
+                'started_at' => now(),
+            ]);
 
-        foreach ($members as $member) {
-            Member::create(['name' => $member, 'game_id' => $game->id]);
-        }
+        $members = collect($members)->map(function (string $member) {
+            $memberName = trim($member);
+            return Member::query()->updateOrCreate([
+                'name' => $memberName,
+                'user_id' => auth()->id(),
+            ]);
+        });
+
+        $game->members()->attach($members->pluck('id'));
 
         $this->games = $this->getGames();
 
@@ -45,6 +62,6 @@ new class extends Component
 
     private function getGames(): Collection
     {
-        return Game::query()->latest()->get();
+        return Game::query()->where('manager_id', auth()->id())->latest()->get();
     }
 };
