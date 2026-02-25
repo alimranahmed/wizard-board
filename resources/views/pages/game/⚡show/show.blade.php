@@ -40,18 +40,18 @@
                 <tr>
                     <th class="w-0.5"></th>
                     @foreach($game->members as $member)
-                    <th class="px-3 py-2 font-semibold text-zinc-900 dark:text-zinc-100 text-center border-l border-zinc-200 dark:border-zinc-700 flex-1 w-48 align-top">
-                        <div>
-                            {{ $member->name }}
-                            <div class="md:inline text-sm text-zinc-900 dark:text-zinc-100">
-                                ({{$cumulativeScores[$member->id] }})
+                        <th class="px-3 py-2 font-semibold text-zinc-900 dark:text-zinc-100 text-center border-l border-zinc-200 dark:border-zinc-700 flex-1 w-48 align-top">
+                            <div>
+                                {{ $member->initials() }}
+                                <div class="md:inline text-xs md:text-sm text-zinc-900 dark:text-zinc-100">
+                                    ({{$cumulativeScores[$member->id] }})
+                                </div>
                             </div>
-                        </div>
-                    </th>
+                        </th>
                     @endforeach
                 </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700 text-xs md:text-sm">
                 @for($roundNumber = 1; $roundNumber <= $this->totalRounds; $roundNumber++)
                     @php
                         $scores = $rounds->get($roundNumber, collect());
@@ -59,17 +59,17 @@
                     <tr
                         class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 {{ $this->latestRound == $roundNumber ? 'bg-zinc-50 dark:bg-zinc-800/80' : '' }}">
                         <td
-                            class="px-3 py-2 text-center font-medium {{ $scores->isEmpty() ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-900 dark:text-zinc-100' }}">
+                            class="px-1 md:px-3 py-2 text-center font-medium {{ $scores->isEmpty() ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-900 dark:text-zinc-100' }}">
                             {{ $roundNumber }}
                         </td>
                         @foreach($game->members as $member)
                             @php
                                 $score = $scores->firstWhere('member_id', $member->id);
                             @endphp
-                        <td class="px-3 py-2 text-center border-l border-zinc-200 dark:border-zinc-700">
+                        <td class="px-0.5 py-2 text-center border-l border-zinc-200 dark:border-zinc-700">
                             @if($score)
                                 @if($score->actual_win !== null)
-                                    <div class="justify-center gap-1.5 text-base">
+                                    <div class="justify-center gap-1.5">
                                         <div
                                             class="md:inline font-bold {{ $score->point > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
                                             {{ $score->point > 0 ? '+' : '' }}{{ $score->point }}
@@ -81,7 +81,7 @@
                                 @else
                                     <div class="flex items-center justify-center">
                                         <span
-                                            class="text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded text-xs font-medium"
+                                            class="text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-0.5 py-0.5 rounded text-xs font-medium"
                                             title="Bid">Bid: {{ $score->target_win }}</span>
                                     </div>
                                 @endif
@@ -147,7 +147,7 @@
                         @endforeach
                     </div>
                 @endif
-                
+
                 @foreach($game->members as $member)
                     @php
                         $target = $game->scores
