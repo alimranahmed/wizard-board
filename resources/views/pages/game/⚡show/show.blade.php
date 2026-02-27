@@ -3,19 +3,21 @@
         <flux:heading>{{ $game->name }}</flux:heading>
 
         <div class="flex gap-2">
-            @if($this->isCurrentRoundComplete)
-                <flux:modal.trigger name="bid-modal">
-                    <flux:button wire:click="openBidModal()">Bid (Round {{ $this->latestRound + 1 }})</flux:button>
-                </flux:modal.trigger>
-            @else
-                <flux:modal.trigger name="bid-modal">
-                    <flux:button variant="subtle" wire:click="openBidModal()">Edit Bids</flux:button>
-                </flux:modal.trigger>
+            @if($this->totalRounds > $this->latestRound)
+                @if($this->isCurrentRoundComplete)
+                    <flux:modal.trigger name="bid-modal">
+                        <flux:button wire:click="openBidModal()">Bid (Round {{ $this->latestRound + 1 }})</flux:button>
+                    </flux:modal.trigger>
+                @else
+                    <flux:modal.trigger name="bid-modal">
+                        <flux:button variant="subtle" wire:click="openBidModal()">Edit Bids</flux:button>
+                    </flux:modal.trigger>
 
-                <flux:modal.trigger name="end-round-modal">
-                    <flux:button variant="primary" wire:click="openEndRoundModal()">End Round {{ $this->latestRound }}
-                    </flux:button>
-                </flux:modal.trigger>
+                    <flux:modal.trigger name="end-round-modal">
+                        <flux:button variant="primary" wire:click="openEndRoundModal()">End Round {{ $this->latestRound }}
+                        </flux:button>
+                    </flux:modal.trigger>
+                @endif
             @endif
         </div>
     </div>
@@ -53,29 +55,29 @@
                             @php
                                 $score = $scores->firstWhere('member_id', $member->id);
                             @endphp
-                        <td class="px-0.5 py-2 text-center border-l border-zinc-200 dark:border-zinc-700">
-                            @if($score)
-                                @if($score->actual_win !== null)
-                                    <div class="justify-center gap-1.5">
-                                        <div
-                                            class="md:inline font-bold {{ $score->point > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                            {{ $score->point > 0 ? '+' : '' }}{{ $score->point }}
+                            <td class="px-0.5 py-2 text-center border-l border-zinc-200 dark:border-zinc-700">
+                                @if($score)
+                                    @if($score->actual_win !== null)
+                                        <div class="justify-center gap-1.5">
+                                            <div
+                                                class="md:inline font-bold {{ $score->point > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                                {{ $score->point > 0 ? '+' : '' }}{{ $score->point }}
+                                            </div>
+                                            <div class="md:inline text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap">
+                                                ({{ $score->actual_win }}/{{ $score->target_win }})
+                                            </div>
                                         </div>
-                                        <div class="md:inline text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap">
-                                            ({{ $score->actual_win }}/{{ $score->target_win }})
+                                    @else
+                                        <div class="flex items-center justify-center">
+                                            <span
+                                                class="text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-0.5 py-0.5 rounded text-xs font-medium"
+                                                title="Bid">Bid: {{ $score->target_win }}</span>
                                         </div>
-                                    </div>
+                                    @endif
                                 @else
-                                    <div class="flex items-center justify-center">
-                                        <span
-                                            class="text-zinc-500 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 px-0.5 py-0.5 rounded text-xs font-medium"
-                                            title="Bid">Bid: {{ $score->target_win }}</span>
-                                    </div>
+                                    <div class="text-zinc-200 dark:text-zinc-700">-</div>
                                 @endif
-                            @else
-                                <div class="text-zinc-200 dark:text-zinc-700">-</div>
-                            @endif
-                        </td>
+                            </td>
                         @endforeach
                     </tr>
                 @endfor
@@ -97,6 +99,11 @@
             </thead>
         </table>
     </div>
+
+    <!-- Leaderboard -->
+    @if($this->latestRound === $this->totalRounds && $this->isCurrentRoundComplete)
+        <x-game.leaderboard :members="$game->members" :currentResult="$this->currentResult" />
+    @endif
 
     <!-- Modals -->
     <flux:modal name="bid-modal" flyout>
