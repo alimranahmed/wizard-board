@@ -117,6 +117,9 @@
                 @foreach($this->orderedMembersForBid as $member)
                     <div class="flex gap-2 justify-between items-center">
                         <flux:input type="number"
+                                    wire:key="bid-{{ $member->id }}"
+                                    name="bid-{{ $member->id }}"
+                                    id="bid-{{ $member->id }}"
                                     label="{{ $member->name }}'s Bid"
                                     min="0"
                                     wire:model="bids.{{ $member->id }}"
@@ -149,7 +152,13 @@
                             ->where('member_id', $member->id)
                             ->first()?->target_win ?? 0;
                     @endphp
-                    <flux:input type="number" min="0" label="{{ $member->name }} won(Bid: {{ $target }})"
+                    <flux:input
+                        type="number"
+                        min="0"
+                        wire:key="actual-wins-{{ $member->id }}"
+                        name="actual-wins-{{ $member->id }}"
+                        id="actual-wins-{{ $member->id }}"
+                        label="{{ $member->name }} won(Bid: {{ $target }})"
                         wire:model="actual_wins.{{ $member->id }}" required />
                 @endforeach
 
