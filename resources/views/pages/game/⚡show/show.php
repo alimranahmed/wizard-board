@@ -126,6 +126,22 @@ new class extends Component
     }
 
     #[Computed]
+    public function orderedMembersForBid()
+    {
+        $round = $this->isCurrentRoundComplete ? ($this->latestRound + 1) : $this->latestRound;
+        $members = $this->game->members->values();
+        $count = $members->count();
+
+        if ($count === 0) {
+            return $members;
+        }
+
+        $offset = ($round - 1) % $count;
+
+        return $members->slice($offset)->concat($members->slice(0, $offset));
+    }
+
+    #[Computed]
     public function rounds()
     {
         return $this->game->scores->groupBy('round')->sortKeys();

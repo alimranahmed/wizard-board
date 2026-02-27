@@ -107,7 +107,7 @@
 
             <form wire:submit.prevent="saveBids()" class="space-y-4">
 
-                @foreach($game->members as $member)
+                @foreach($this->orderedMembersForBid as $member)
                     <div class="flex gap-2 justify-between items-center">
                         <flux:input type="number"
                                     label="{{ $member->name }}'s Bid"
@@ -116,6 +116,10 @@
                                     required />
                     </div>
                 @endforeach
+
+                @error('bids')
+                    <flux:error message="{{$message}}"></flux:error>
+                @enderror
 
                 <div class="flex justify-end pt-4">
                     <flux:button type="submit" variant="primary">Save Bids</flux:button>
@@ -131,7 +135,7 @@
 
             <form wire:submit.prevent="saveActualWins()" class="space-y-4">
 
-                @foreach($game->members as $member)
+                @foreach($this->orderedMembersForBid as $member)
                     @php
                         $target = $game->scores
                             ->where('round', $this->latestRound)
@@ -142,6 +146,9 @@
                         wire:model="actual_wins.{{ $member->id }}" required />
                 @endforeach
 
+                @error('actual_wins')
+                    <flux:error message="{{$message}}"></flux:error>
+                @enderror
                 <div class="flex justify-end pt-4">
                     <flux:button type="submit" variant="primary">Save & End Round</flux:button>
                 </div>
